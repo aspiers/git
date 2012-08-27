@@ -311,7 +311,7 @@ static int no_wildcard(const char *string)
 }
 
 void add_exclude(const char *string, const char *base,
-		 int baselen, struct exclude_list *which)
+		 int baselen, struct exclude_list *el)
 {
 	struct exclude *x;
 	size_t len;
@@ -346,8 +346,8 @@ void add_exclude(const char *string, const char *base,
 	x->nowildcardlen = simple_length(string);
 	if (*string == '*' && no_wildcard(string+1))
 		x->flags |= EXC_FLAG_ENDSWITH;
-	ALLOC_GROW(which->excludes, which->nr + 1, which->alloc);
-	which->excludes[which->nr++] = x;
+	ALLOC_GROW(el->excludes, el->nr + 1, el->alloc);
+	el->excludes[el->nr++] = x;
 }
 
 static void *read_skip_worktree_file_from_index(const char *path, size_t *size)
@@ -389,7 +389,7 @@ int add_excludes_from_file_to_list(const char *fname,
 				   const char *base,
 				   int baselen,
 				   char **buf_p,
-				   struct exclude_list *which,
+				   struct exclude_list *el,
 				   int check_index)
 {
 	struct stat st;
@@ -436,7 +436,7 @@ int add_excludes_from_file_to_list(const char *fname,
 		if (buf[i] == '\n') {
 			if (entry != buf + i && entry[0] != '#') {
 				buf[i - (i && buf[i-1] == '\r')] = 0;
-				add_exclude(entry, base, baselen, which);
+				add_exclude(entry, base, baselen, el);
 			}
 			entry = buf + i + 1;
 		}
