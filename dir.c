@@ -456,6 +456,12 @@ void add_excludes_from_file(struct dir_struct *dir, const char *fname)
 		die("cannot use %s as an exclude file", fname);
 }
 
+static void free_exclude_stack(struct exclude_stack *stk)
+{
+	free(stk->filebuf);
+	free(stk);
+}
+
 /*
  * Loads the per-directory exclude list for the substring of base
  * which has a char length of baselen.
@@ -481,8 +487,7 @@ static void prep_exclude(struct dir_struct *dir, const char *base, int baselen)
 			struct exclude *exclude = el->excludes[--el->nr];
 			free(exclude);
 		}
-		free(stk->filebuf);
-		free(stk);
+		free_exclude_stack(stk);
 	}
 
 	/* Read from the parent directories and push them down. */
@@ -1472,4 +1477,18 @@ void free_pathspec(struct pathspec *pathspec)
 {
 	free(pathspec->items);
 	pathspec->items = NULL;
+}
+
+void free_directory(struct dir_struct *dir)
+{
+	int st;
+	for (st = EXC_CMDL; st <= EXC_FILE; st++)
+		free_excludes(&dir->exclude_list[st]);
+
+	struct exclude_stack *prev, *stk = dir->exclude_stack;
+	while (stk) {
+		prev = stk->prev;
+		free_exclude_stack(stk);
+		stk = prev;
+	}
 }
