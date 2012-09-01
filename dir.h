@@ -109,10 +109,13 @@ struct dir_entry *dir_add_ignored(struct dir_struct *dir, const char *pathname, 
  */
 struct path_exclude_check {
 	struct dir_struct *dir;
+	struct exclude *exclude;
 	struct strbuf path;
 };
 extern void path_exclude_check_init(struct path_exclude_check *, struct dir_struct *);
 extern void path_exclude_check_clear(struct path_exclude_check *);
+extern struct exclude *path_excluded_1(struct path_exclude_check *, const char *,
+				       int namelen, int *dtype);
 extern int path_excluded(struct path_exclude_check *, const char *, int namelen, int *dtype);
 
 
