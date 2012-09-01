@@ -31,6 +31,9 @@ struct exclude_list {
 		int baselen;
 		int to_exclude;
 		int flags;
+		const char *src;
+		int srcpos; /* counting starts from 1 for line numbers in ignore files,
+			       and from -1 decrementing for patterns from CLI (--exclude) */
 	} **excludes;
 };
 
@@ -123,7 +126,7 @@ extern int add_excludes_from_file_to_list(const char *fname, const char *base, i
 					  char **buf_p, struct exclude_list *el, int check_index);
 extern void add_excludes_from_file(struct dir_struct *, const char *fname);
 extern void add_exclude(const char *string, const char *base,
-			int baselen, struct exclude_list *el);
+			int baselen, struct exclude_list *el, const char *src, int srcpos);
 extern void free_excludes(struct exclude_list *el);
 extern int file_exists(const char *);
 
