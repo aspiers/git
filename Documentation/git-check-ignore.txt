@@ -1,0 +1,58 @@
+git-check-ignore(1)
+=================
+
+NAME
+----
+git-check-ignore - Debug gitignore / exclude files
+
+
+SYNOPSIS
+--------
+[verse]
+'git check-ignore' pathname...
+'git check-ignore' --stdin [-z] < <list-of-paths>
+
+DESCRIPTION
+-----------
+
+For each pathname given via the command-line or from a file via
+`--stdin`, this command will list the first exclude pattern found (if
+any) which explicitly excludes or includes that pathname.  Note that
+within any given exclude file, later patterns take precedence over
+earlier ones, so any matching pattern which this command outputs may
+not be the one you would immediately expect.
+
+OPTIONS
+-------
+--stdin::
+	Read file names from stdin instead of from the command-line.
+
+-z::
+	Only meaningful with `--stdin`; paths are separated with a
+	NUL character instead of a linefeed character.
+
+OUTPUT
+------
+
+The output is a series of lines of the form:
+
+<path> COLON SP <type> SP <pattern> SP <source> SP <position> LF
+
+<path> is the path of a file being queried, <type> is either
+'excluded' or 'included' (for patterns prefixed with '!'), <pattern>
+is the matching pattern, <source> is the pattern's source file (either
+as an absolute path or relative to the repository root), and
+<position> is the position of the pattern within that source.
+
+If no pattern matches a given path, nothing will be output for that
+path.
+
+SEE ALSO
+--------
+linkgit:gitignore[5]
+linkgit:gitconfig[5]
+linkgit:git-ls-files[5]
+
+GIT
+---
+Part of the linkgit:git[1] suite
