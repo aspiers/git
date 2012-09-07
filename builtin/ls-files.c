@@ -35,6 +35,7 @@ static int error_unmatch;
 static char *ps_matched;
 static const char *with_tree;
 static int exc_given;
+static int exclude_args;
 
 static const char *tag_cached = "";
 static const char *tag_unmerged = "";
@@ -423,7 +424,7 @@ static int option_parse_exclude(const struct option *opt,
 	struct exclude_list *list = opt->value;
 
 	exc_given = 1;
-	add_exclude(arg, "", 0, list);
+	add_exclude(arg, "", 0, list, "--exclude option", --exclude_args);
 
 	return 0;
 }
