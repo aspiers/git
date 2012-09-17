@@ -81,9 +81,10 @@ test_expect_success 'pretend we have fixed a known breakage (run in sub test-lib
 	./passing-todo.sh >out 2>err &&
 	! test -s err &&
 	sed -e 's/^> //' >expect <<-\\EOF &&
-	> ok 1 - pretend we have fixed a known breakage # TODO known breakage
-	> # fixed 1 known breakage(s)
-	> # passed all 1 test(s)
+	> ok 1 - pretend we have fixed a known breakage # TODO known breakage vanished
+	> # fixed 1 known breakage(s); please update test(s)
+	> # still have 1 known breakage(s)
+	> # passed all remaining 0 test(s)
 	> 1..1
 	EOF
 	test_cmp expect out)
