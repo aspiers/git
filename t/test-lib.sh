@@ -182,13 +182,13 @@ then
 		error)
 			tput bold; tput setaf 1;; # bold red
 		skip)
-			tput bold; tput setaf 2;; # bold green
+			tput setaf 4;;            # blue
 		warn)
 			tput bold; tput setaf 3;; # bold yellow
 		pass)
 			tput setaf 2;;            # green
 		info)
-			tput setaf 3;;            # brown
+			tput setaf 3;;            # yellow/brown
 		*)
 			test -n "$quiet" && return;;
 		esac
