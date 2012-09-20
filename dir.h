@@ -103,8 +103,8 @@ extern int is_excluded_from_list(const char *pathname, int pathlen, const char *
 struct dir_entry *dir_add_ignored(struct dir_struct *dir, const char *pathname, int len);
 
 /*
- * The excluded() API is meant for callers that check each level of leading
- * directory hierarchies with excluded() to avoid recursing into excluded
+ * The is_excluded() API is meant for callers that check each level of leading
+ * directory hierarchies with is_excluded() to avoid recursing into excluded
  * directories.  Callers that do not do so should use this API instead.
  */
 struct path_exclude_check {
