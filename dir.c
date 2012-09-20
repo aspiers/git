@@ -511,22 +511,26 @@ static void prep_exclude(struct dir_struct *dir, const char *base, int baselen)
 	dir->basebuf[baselen] = '\0';
 }
 
-/* Scan the list and let the last match determine the fate.
- * Return 1 for exclude, 0 for include and -1 for undecided.
+/*
+ * Scan the given exclude list in reverse to see whether pathname
+ * should be ignored.  The first match (i.e. the last on the list), if
+ * any, determines the fate.  Returns the exclude_list element which
+ * matched, or NULL for undecided.
  */
-int is_excluded_from_list(const char *pathname,
-			  int pathlen, const char *basename, int *dtype,
-			  struct exclude_list *el)
+static struct exclude *last_exclude_matching_from_list(const char *pathname,
+						       int pathlen,
+						       const char *basename,
+						       int *dtype,
+						       struct exclude_list *el)
 {
 	int i;
 
 	if (!el->nr)
-		return -1;	/* undefined */
+		return NULL;	/* undefined */
 
 	for (i = el->nr - 1; 0 <= i; i--) {
 		struct exclude *x = el->excludes[i];
 		const char *name, *exclude = x->pattern;
-		int to_exclude = x->to_exclude;
 		int namelen, prefix = x->nowildcardlen;
 
 		if (x->flags & EXC_FLAG_MUSTBEDIR) {
@@ -540,14 +544,14 @@ int is_excluded_from_list(const char *pathname,
 			/* match basename */
 			if (prefix == x->patternlen) {
 				if (!strcmp_icase(exclude, basename))
-					return to_exclude;
+					return x;
 			} else if (x->flags & EXC_FLAG_ENDSWITH) {
 				if (x->patternlen - 1 <= pathlen &&
 				    !strcmp_icase(exclude + 1, pathname + pathlen - x->patternlen + 1))
-					return to_exclude;
+					return x;
 			} else {
 				if (fnmatch_icase(exclude, basename, 0) == 0)
-					return to_exclude;
+					return x;
 			}
 			continue;
 		}
@@ -582,8 +586,23 @@ int is_excluded_from_list(const char *pathname,
 		}
 
 		if (!namelen || !fnmatch_icase(exclude, name, FNM_PATHNAME))
-			return to_exclude;
+			return x;
 	}
+	return NULL; /* undecided */
+}
+
+/*
+ * Scan the list and let the last match determine the fate.
+ * Return 1 for exclude, 0 for include and -1 for undecided.
+ */
+int is_excluded_from_list(const char *pathname,
+			  int pathlen, const char *basename, int *dtype,
+			  struct exclude_list *el)
+{
+	struct exclude *exclude;
+	exclude = last_exclude_matching_from_list(pathname, pathlen, basename, dtype, el);
+	if (exclude)
+		return exclude->to_exclude;
 	return -1; /* undecided */
 }
 
