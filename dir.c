@@ -514,9 +514,9 @@ static void prep_exclude(struct dir_struct *dir, const char *base, int baselen)
 /* Scan the list and let the last match determine the fate.
  * Return 1 for exclude, 0 for include and -1 for undecided.
  */
-int excluded_from_list(const char *pathname,
-		       int pathlen, const char *basename, int *dtype,
-		       struct exclude_list *el)
+int is_excluded_from_list(const char *pathname,
+			  int pathlen, const char *basename, int *dtype,
+			  struct exclude_list *el)
 {
 	int i;
 
@@ -596,8 +596,9 @@ static int excluded(struct dir_struct *dir, const char *pathname, int *dtype_p)
 
 	prep_exclude(dir, pathname, basename-pathname);
 	for (st = EXC_CMDL; st <= EXC_FILE; st++) {
-		switch (excluded_from_list(pathname, pathlen, basename,
-					   dtype_p, &dir->exclude_list[st])) {
+		switch (is_excluded_from_list(pathname, pathlen,
+					      basename, dtype_p,
+					      &dir->exclude_list[st])) {
 		case 0:
 			return 0;
 		case 1:
