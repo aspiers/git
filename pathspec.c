@@ -77,9 +77,20 @@ void treat_gitlinks(const char **pathspec)
 }
 
 /*
+ * Dies if the given path refers to a file inside a symlinked
+ * directory.
+ */
+void validate_path(const char *path, const char *prefix)
+{
+	if (has_symlink_leading_path(path, strlen(path))) {
+		int len = prefix ? strlen(prefix) : 0;
+		die(_("'%s' is beyond a symbolic link"), path + len);
+	}
+}
+
+/*
  * Normalizes argv relative to prefix, via get_pathspec(), and then
- * dies if any path in the normalized list refers to a file inside a
- * symlinked directory.
+ * runs validate_path() on each path in the normalized list.
  */
 const char **validate_pathspec(const char **argv, const char *prefix)
 {
@@ -88,10 +99,7 @@ const char **validate_pathspec(const char **argv, const char *prefix)
 	if (pathspec) {
 		const char **p;
 		for (p = pathspec; *p; p++) {
-			if (has_symlink_leading_path(*p, strlen(*p))) {
-				int len = prefix ? strlen(prefix) : 0;
-				die(_("'%s' is beyond a symbolic link"), *p + len);
-			}
+			validate_path(*p, prefix);
 		}
 	}
 
