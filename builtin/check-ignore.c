@@ -53,22 +53,13 @@ static void output_exclude(const char *path, struct exclude *exclude)
 	}
 }
 
-static int check_ignore(const char *prefix, const char **pathspec)
+static int check_ignore(struct path_exclude_check check,
+			const char *prefix, const char **pathspec)
 {
-	struct dir_struct dir;
 	const char *path, *full_path;
 	char *seen;
 	int num_ignored = 0, dtype = DT_UNKNOWN, i;
-	struct path_exclude_check check;
 	struct exclude *exclude;
-
-	/* read_cache() is only necessary so we can watch out for submodules. */
-	if (read_cache() < 0)
-		die(_("index file corrupt"));
-
-	memset(&dir, 0, sizeof(dir));
-	dir.flags |= DIR_COLLECT_IGNORED;
-	setup_standard_excludes(&dir);
 
 	if (!pathspec || !*pathspec) {
 		if (!quiet)
@@ -76,7 +67,6 @@ static int check_ignore(const char *prefix, const char **pathspec)
 		return 0;
 	}
 
-	path_exclude_check_init(&check, &dir);
 	/*
 	 * look for pathspecs matching entries in the index, since these
 	 * should not be ignored, in order to be consistent with
@@ -100,13 +90,11 @@ static int check_ignore(const char *prefix, const char **pathspec)
 		}
 	}
 	free(seen);
-	clear_directory(&dir);
-	path_exclude_check_clear(&check);
 
 	return num_ignored;
 }
 
-static int check_ignore_stdin_paths(const char *prefix)
+static int check_ignore_stdin_paths(struct path_exclude_check check, const char *prefix)
 {
 	struct strbuf buf, nbuf;
 	char **pathspec = NULL;
@@ -129,17 +117,18 @@ static int check_ignore_stdin_paths(const char *prefix)
 	}
 	ALLOC_GROW(pathspec, nr + 1, alloc);
 	pathspec[nr] = NULL;
-	num_ignored = check_ignore(prefix, (const char **)pathspec);
+	num_ignored = check_ignore(check, prefix, (const char **)pathspec);
 	maybe_flush_or_die(stdout, "attribute to stdout");
 	strbuf_release(&buf);
 	strbuf_release(&nbuf);
-	free(pathspec);
 	return num_ignored;
 }
 
 int cmd_check_ignore(int argc, const char **argv, const char *prefix)
 {
 	int num_ignored;
+	struct dir_struct dir;
+	struct path_exclude_check check;
 
 	git_config(git_default_config, NULL);
 
@@ -162,12 +151,24 @@ int cmd_check_ignore(int argc, const char **argv, const char *prefix)
 			die(_("cannot have both --quiet and --verbose"));
 	}
 
+	/* read_cache() is only necessary so we can watch out for submodules. */
+	if (read_cache() < 0)
+		die(_("index file corrupt"));
+
+	memset(&dir, 0, sizeof(dir));
+	dir.flags |= DIR_COLLECT_IGNORED;
+	setup_standard_excludes(&dir);
+
+	path_exclude_check_init(&check, &dir);
 	if (stdin_paths) {
-		num_ignored = check_ignore_stdin_paths(prefix);
+		num_ignored = check_ignore_stdin_paths(check, prefix);
 	} else {
-		num_ignored = check_ignore(prefix, argv);
+		num_ignored = check_ignore(check, prefix, argv);
 		maybe_flush_or_die(stdout, "ignore to stdout");
 	}
+
+	clear_directory(&dir);
+	path_exclude_check_clear(&check);
 
 	return !num_ignored;
 }
