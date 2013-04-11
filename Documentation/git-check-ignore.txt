@@ -66,6 +66,11 @@ are also used instead of colons and hard tabs:
 <source> <NULL> <linenum> <NULL> <pattern> <NULL> <pathname> <NULL>
 
 
+Buffering happens as documented under the `GIT_FLUSH` option in
+linkgit:git[1].  The caller is responsible for avoiding deadlocks
+caused by overfilling an input buffer or reading from an empty output
+buffer.
+
 EXIT STATUS
 -----------
 
