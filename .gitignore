@@ -157,6 +157,7 @@
 /git-show-ref
 /git-sparse-checkout
 /git-splice
+/git-splice--lib
 /git-stage
 /git-stash
 /git-status
@@ -167,6 +168,7 @@
 /git-switch
 /git-symbolic-ref
 /git-tag
+/git-transplant
 /git-unpack-file
 /git-unpack-objects
 /git-update-index

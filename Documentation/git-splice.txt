@@ -118,7 +118,7 @@ EXAMPLES
 
 SEE ALSO
 --------
-linkgit:git-rebase[1], linkgit:git-cherry-pick[1]
+linkgit:git-transplant[1], linkgit:git-rebase[1], linkgit:git-cherry-pick[1]
 
 GIT
 ---

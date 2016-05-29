@@ -35,6 +35,7 @@ LONG_USAGE=\
 
 OPTIONS_SPEC=
 . git-sh-setup
+. git-splice--lib
 
 # Useful when debugging with bash; harmless otherwise
 PS4="+\${BASH_SOURCE/\$HOME/\~}@\${LINENO}(\${FUNCNAME[0]}): " \
@@ -50,6 +51,7 @@ remove_todo="$splice_dir/remove-todo"
 rebase_exit="$splice_dir/rebase-exit"
 rebase_cancelled="$splice_dir/rebase-cancelled"
 TMP_BRANCH="tmp/splice"
+workflow=splice
 
 main () {
 	parse_opts "$@"
@@ -237,10 +239,6 @@ tweak_rebase_error () {
 		sed -e 's/git rebase \(--continue\|--abort\)/git splice \1/g'
 }
 
-valid_ref () {
-	git rev-parse --quiet --verify "$@" >/dev/null
-}
-
 # Returns true (0) iff the arguments passed explicitly describe a
 # range of commits (e.g. A..B).  Note that this deliberately returns
 # false when fed a single commit-ish A, even though a commit-ish
@@ -256,20 +254,6 @@ valid_commit_range () {
 		fatal "Failed to parse commit range $1"
 	fi
 	test "${#parsed[@]}" -gt 1
-}
-
-cherry_pick_active () {
-	# Ideally git rebase would have some plumbing for this, so
-	# we wouldn't have to assume knowledge of internals.
-	valid_ref CHERRY_PICK_HEAD
-}
-
-rebase_active () {
-	# Ideally git rebase would have some plumbing for this, so
-	# we wouldn't have to assume knowledge of internals.  See:
-	# http://stackoverflow.com/questions/3921409/how-to-know-if-there-is-a-git-rebase-in-progress
-	test -e "$git_dir/rebase-merge" ||
-		test -e "$git_dir/rebase-apply"
 }
 
 removing_root () {
@@ -297,8 +281,8 @@ validate_base () {
 
 error_and_pause () {
 	warn "$*"
-	warn "When you have resolved this problem, run \"git splice --continue\","
-	warn "or run \"git splice --abort\" to abandon the splice."
+	warn "When you have resolved this problem, run \"git $workflow --continue\","
+	warn "or run \"git $workflow --abort\" to abandon the splice."
 	exit 1
 }
 
@@ -387,14 +371,6 @@ splice_abort () {
 	fi
 }
 
-head_ref () {
-	git symbolic-ref --short -q HEAD
-}
-
-on_branch () {
-	[ "$(head_ref)" = "$1" ]
-}
-
 on_tmp_branch () {
 	on_branch "$TMP_BRANCH"
 }
@@ -428,38 +404,6 @@ ensure_splice_not_in_progress () {
 	then
 		fatal "$TMP_BRANCH branch exists, but no splice in"\
 		    "progress. Try deleting $TMP_BRANCH first."
-	fi
-}
-
-in_progress_error () {
-	cat <<EOF >&2
-$*
-
-git splice already in progress; please complete it, or run
-
-  git splice --abort
-EOF
-	exit 1
-}
-
-ensure_cherry_pick_not_in_progress () {
-	if cherry_pick_active
-	then
-		fatal "Can't start git splice when there is a"\
-		      "cherry-pick in progress"
-	fi
-}
-
-ensure_rebase_not_in_progress () {
-	if rebase_active
-	then
-		warn "Can't start git splice when there is a rebase in progress."
-
-		# We know this will fail; we run it because we want to output
-		# the same error message which git-rebase uses to tell the user
-		# to finish or abort their in-flight rebase.
-		git rebase
-		exit 1
 	fi
 }
 
@@ -497,14 +441,6 @@ rebase_edit () {
 		>"$rebase_todo"
 		touch "$rebase_cancelled"
 	fi
-}
-
-warn () {
-	echo >&2 "$*"
-}
-
-fatal () {
-	die "fatal: $*"
 }
 
 parse_opts () {
@@ -547,6 +483,10 @@ parse_opts () {
 			rebase_edit=yes
 			rebase_todo="$2"
 			shift 2
+                ;;
+            --transplant)
+                workflow=transplant
+                shift
 			;;
 		*)
 			break

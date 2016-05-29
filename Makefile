@@ -611,12 +611,14 @@ SCRIPT_SH += git-quiltimport.sh
 SCRIPT_SH += git-request-pull.sh
 SCRIPT_SH += git-splice.sh
 SCRIPT_SH += git-submodule.sh
+SCRIPT_SH += git-transplant.sh
 SCRIPT_SH += git-web--browse.sh
 
 SCRIPT_LIB += git-mergetool--lib
 SCRIPT_LIB += git-rebase--preserve-merges
 SCRIPT_LIB += git-sh-i18n
 SCRIPT_LIB += git-sh-setup
+SCRIPT_LIB += git-splice--lib
 
 SCRIPT_PERL += git-add--interactive.perl
 SCRIPT_PERL += git-archimport.perl

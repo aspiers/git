@@ -1,0 +1,95 @@
+git-transplant(1)
+=================
+
+NAME
+----
+git-transplant - Transplant commits from current branch to another
+
+SYNOPSIS
+--------
+[verse]
+'git transplant' [<options>] <revision range> <destination branch>
+
+DESCRIPTION
+-----------
+Transplant a range of commits from the current branch onto or into
+another, removing them from the original branch, which will remain
+checked out upon completion.  The commits can optionally be inserted
+inside the destination branch, i.e. not at its tip, using the
+`--after` option.
+
+The revision range is specified in the standard format accepted by
+`git rev-parse`, e.g.
+
+    A..B
+    A...B
+    A^!   (just commit A)
+
+Obviously this command rewrites history!  As with
+linkgit:git-rebase[1], you should be aware of all the implications of
+history rewriting before using it.  In particular, if the range does
+not include the tip of the source branch, there is a risk of conflicts
+once the remainder of the source branch is rebased with the commits
+removed.
+
+This command is actually just a glorified wrapper around
+linkgit:git-splice[1].
+
+OPTIONS
+-------
+
+-a <commit>::
+--after=<commit>::
+	Transplant into inside the destination branch after the given
+	commit.
+
+-n <commit>::
+--new-from=<commit>::
+	First create the destination branch starting at the given
+	commit.
+
+--abort::
+	Abort an in-progress transplant.
+
+--continue::
+	Resume an in-progress transplant.
+
+--in-progress:
+	Exit 0 if and only if a splice is in progress.
+
+EXAMPLES
+--------
+`git transplant A..B X`::
+
+	Move commits A..B from the current branch onto branch X.
+
+`git transplant --after=C A..B X`::
+
+	Move commits A..B from the current branch into branch X
+	after commit C.
+
+`git transplant --new-from=Y A..B X`::
+
+	Create a new branch X starting at ref Y, then
+	move commits A..B from the current branch onto X.
+
+`git transplant --abort`::
+
+	Abort a transplant which failed during cherry-pick or rebase
+
+`git transplant --continue`::
+
+	Resume a transplant after manually fixing conflicts caused by
+	cherry-pick or rebase.
+
+`git transplant --in-progress && git transplant --abort`::
+
+	Abort if there is a transplant in progress.
+
+SEE ALSO
+--------
+linkgit:git-splice[1], linkgit:git-rebase[1], linkgit:git-cherry-pick[1]
+
+GIT
+---
+Part of the linkgit:git[1] suite
