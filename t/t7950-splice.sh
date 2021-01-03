@@ -71,22 +71,22 @@ reset () {
 git_splice () {
 	$test_exp git splice ${debug:+-d} "$@" >stdout 2>stderr
 	ret=$?
-	set +x
-	if [ -s stdout ]
-	then
-		echo "====== STDOUT from $test_exp git splice $* ======"
-	fi
-	cat stdout
-	if [ -s stderr ]
-	then
-		echo "------ STDERR from $test_exp git splice $* ------"
-		cat stderr
-	fi
-	echo "====== exit $ret from $test_exp git splice $* ======"
-	if test -n "$trace"
-	then
-		set -x
-	fi
+	# set +x
+	# if [ -s stdout ]
+	# then
+	# 	echo "====== STDOUT from $test_exp git splice $* ======"
+	# fi
+	# cat stdout
+	# if [ -s stderr ]
+	# then
+	# 	echo "------ STDERR from $test_exp git splice $* ------"
+	# 	cat stderr
+	# fi
+	# echo "====== exit $ret from $test_exp git splice $* ======"
+	# if test -n "$trace"
+	# then
+	# 	set -x
+	# fi
 	return $ret
 }
 
