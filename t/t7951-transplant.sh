@@ -9,8 +9,8 @@ This tests all features of git-transplant.
 '
 
 # Useful when debugging with bash; harmless otherwise
-PS4="+\${BASH_SOURCE/\$HOME/\~}@\${LINENO}(\${FUNCNAME[0]}): " \
-   && export PS4
+# PS4="+\${BASH_SOURCE/\$HOME/\~}@\${LINENO}(\${FUNCNAME[0]}): " \
+#    && export PS4
 
 . ./test-lib.sh
 
