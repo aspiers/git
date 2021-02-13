@@ -1,0 +1,4 @@
+(defun myfunc (a b)
+  "This is a really cool function."
+  (let ((c (+ a b)))
+    (format "one more than the total is %d" (1+ c))))

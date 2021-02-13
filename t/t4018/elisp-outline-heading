@@ -1,0 +1,6 @@
+;;; A top-level outline heading
+;;;; A second-level outline heading RIGHT
+
+;; This is a ChangeMe comment outside top-level forms
+(defun foo ()
+  (bar 1 2 3)

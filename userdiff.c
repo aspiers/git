@@ -53,6 +53,15 @@ PATTERNS("dts",
 	 /* Property names and math operators */
 	 "[a-zA-Z0-9,._+?#-]+"
 	 "|[-+*/%&^|!~]|>>|<<|&&|\\|\\|"),
+PATTERNS("elisp",
+	 /* Top level forms and outline headings */
+	 "^((\\(|;;;+ +).+)",
+	 /*
+	  * Emacs Lisp allows symbol names containing any characters.
+	  * However spaces within the symbol must be escaped.
+	  */
+	 "(\\.|[^ ()])+"
+	 ),
 PATTERNS("elixir",
 	 "^[ \t]*((def(macro|module|impl|protocol|p)?|test)[ \t].*)$",
 	 /* -- */

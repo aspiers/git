@@ -33,6 +33,7 @@ diffpatterns="
 	csharp
 	css
 	dts
+	elisp
 	elixir
 	fortran
 	fountain

@@ -815,6 +815,8 @@ patterns are available:
 
 - `dts` suitable for devicetree (DTS) files.
 
+- `elisp` suitable for source code in the Emacs Lisp language.
+
 - `elixir` suitable for source code in the Elixir language.
 
 - `fortran` suitable for source code in the Fortran language.
